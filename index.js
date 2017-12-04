@@ -24,6 +24,8 @@ var execute = function(endpoint, region, path, headers, method, body) {
       console.log('>>>', method, path);
     }
 
+    if (method == 'OPTIONS') path = '/'
+
     req.method = method || 'GET';
     req.path = path;
     req.region = region;
@@ -41,10 +43,12 @@ var execute = function(endpoint, region, path, headers, method, body) {
     // the one used for signing
     var entries = Object.entries(headers)
     for (var i=0, len=entries.length; i<len; i++) {
-            if (entries[i][0] != "host" && 
+            if (entries[i][0] == "origin") {
+                req.headers["origin"] = "https://" + endpoint.host
+            } else if (entries[i][0] != "host" &&
                 entries[i][0] != "accept-encoding" &&
-                entries[i][0] != "connection" &&
-                entries[i][0] != "origin") {
+                entries[i][0] != "connection"
+            ) {
                 req.headers[entries[i][0]] = entries[i][1]
             }
     }
